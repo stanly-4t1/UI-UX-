@@ -41,8 +41,8 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        // Ensure createRoot is available directly from ReactDOM (UMD build)
-        const { createRoot } = ReactDOM;
+        // Add console logs to help debug if ReactDOM or createRoot are not found
+        console.log('Script started. Checking ReactDOM availability...');
 
         // Custom Card component for a modern, glassmorphism-like effect
         const Card = ({ children, className = '' }) => {
@@ -148,14 +148,20 @@
         document.addEventListener('DOMContentLoaded', () => {
           const container = document.getElementById('root');
           if (container) {
-            // Only create root if it hasn't been created yet
-            if (!reactRoot) {
-              reactRoot = createRoot(container);
+            // Check if ReactDOM and createRoot are available
+            if (typeof ReactDOM !== 'undefined' && typeof ReactDOM.createRoot === 'function') {
+              console.log('ReactDOM and createRoot are available. Attempting to render...');
+              // Only create root if it hasn't been created yet
+              if (!reactRoot) {
+                reactRoot = ReactDOM.createRoot(container); // Direct call
+              }
+              // Render the App component using the existing root
+              reactRoot.render(<App />);
+            } else {
+              console.error('ReactDOM or ReactDOM.createRoot is not available. Check CDN loading or script order.');
             }
-            // Render the App component using the existing root
-            reactRoot.render(<App />);
           } else {
-            console.error('Root element with ID "root" not found in the document.');
+            console.error('Root element with ID "root" not found in the document. Ensure <div id="root"> exists.');
           }
         });
     </script>
