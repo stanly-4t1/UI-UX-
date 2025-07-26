@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Counter - UI/UX Showcase</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load React and ReactDOM from CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- The line below was removed as it was causing the 'process is not defined' error -->
+    <!-- <script crossorigin src="https://unpkg.com/react-dom/client"></script> -->
+    <style>
+        /* Custom CSS for the animated background and Inter font */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow: hidden; /* Prevent scrollbars from gradient animation */
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Animation for the count number */
+        .animate-pulse-once {
+            animation: pulseOnce 0.5s ease-out;
+        }
+
+        @keyframes pulseOnce {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Ensure createRoot is available directly from ReactDOM (UMD build)
+        const { createRoot } = ReactDOM;
+
+        // Custom Card component for a modern, glassmorphism-like effect
+        const Card = ({ children, className = '' }) => {
+          return (
+            <div
+              className={`bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg border border-opacity-20 border-white rounded-2xl shadow-xl p-8 md:p-12 text-center text-white transform transition-all duration-500 ease-in-out hover:scale-[1.01] ${className}`}
+              style={{
+                boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+              }}
+            >
+              {children}
+            </div>
+          );
+        };
+
+        // Custom Button component with enhanced styling and hover effects
+        const CustomButton = ({ onClick, children, className = '' }) => {
+          return (
+            <button
+              onClick={onClick}
+              className={`relative px-8 py-4 rounded-full font-semibold text-lg overflow-hidden group transition-all duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 ${className}`}
+            >
+              <span className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 opacity-90 group-hover:opacity-100 transition-opacity duration-300"></span>
+              <span className="absolute inset-0 border border-white border-opacity-30 rounded-full"></span>
+              <span className="relative z-10 text-white group-hover:text-white transition-colors duration-300">
+                {children}
+              </span>
+            </button>
+          );
+        };
+
+        // Main App component
+        function App() {
+          const [count, setCount] = React.useState(0);
+
+          // Function to handle incrementing the count
+          const handleIncrement = () => {
+            setCount(prevCount => prevCount + 1);
+          };
+
+          // Function to handle decrementing the count
+          const handleDecrement = () => {
+            setCount(prevCount => prevCount - 1);
+          };
+
+          // Dynamic background effect (subtle gradient animation)
+          React.useEffect(() => {
+            const body = document.body;
+            body.style.background = 'linear-gradient(45deg, #1a202c, #2d3748, #4a5568)';
+            body.style.backgroundSize = '400% 400%';
+            body.style.animation = 'gradientAnimation 15s ease infinite';
+
+            // Clean up the style when the component unmounts
+            return () => {
+              body.style.background = '';
+              body.style.backgroundSize = '';
+              body.style.animation = '';
+            };
+          }, []);
+
+          return (
+            <div className="min-h-screen flex items-center justify-center p-4">
+              <Card className="max-w-md w-full mx-auto">
+                <h1 className="text-4xl md:text-5xl font-extrabold mb-6 drop-shadow-lg">
+                  Interactive Counter
+                </h1>
+                <p className="text-lg md:text-xl text-white text-opacity-80 mb-8 leading-relaxed">
+                  Experience a sleek and modern counter designed with UI/UX principles.
+                  Observe the subtle animations and responsive design.
+                </p>
+                <div className="flex flex-col md:flex-row items-center justify-center space-y-6 md:space-y-0 md:space-x-8">
+                  <CustomButton onClick={handleDecrement} className="bg-red-600 hover:bg-red-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" />
+                    </svg>
+                    Decrement
+                  </CustomButton>
+
+                  <span className="text-7xl md:text-8xl font-black text-white drop-shadow-2xl animate-pulse-once">
+                    {count}
+                  </span>
+
+                  <CustomButton onClick={handleIncrement} className="bg-blue-600 hover:bg-blue-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Increment
+                  </CustomButton>
+                </div>
+                <p className="mt-8 text-sm text-white text-opacity-60">
+                  Built with React and Tailwind CSS for a responsive and engaging user experience.
+                </p>
+              </Card>
+            </div>
+          );
+        }
+
+        // Global variable for the root instance, ensuring it's only created once.
+        let reactRoot = null;
+
+        // This is the main entry point for the React application.
+        // It ensures that createRoot is called only once and after the DOM is loaded.
+        document.addEventListener('DOMContentLoaded', () => {
+          const container = document.getElementById('root');
+          if (container) {
+            // Only create root if it hasn't been created yet
+            if (!reactRoot) {
+              reactRoot = createRoot(container);
+            }
+            // Render the App component using the existing root
+            reactRoot.render(<App />);
+          } else {
+            console.error('Root element with ID "root" not found in the document.');
+          }
+        });
+    </script>
+</body>
+</html>
